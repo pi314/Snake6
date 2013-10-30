@@ -1,0 +1,52 @@
+#game_field {
+    width: 751px;
+    height: 550px;
+    background: #111111;
+    margin: auto;
+    font-size: 0px;
+}
+
+#info {
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 1px;
+    width: 200px;
+    height: 550px;
+    background:#222222;
+}
+
+.snake_info {
+    margin: 25px;
+    padding: 15px;
+    width: 120px;
+    height: 70px;
+    background: #303030;
+    border-radius: 10px;
+}
+
+#field {
+    display: inline-block;
+    width: 550px;
+    height: 550px;
+    background: #111111;
+}
+
+.control {
+    color: #666666;
+    vertical-align: top;
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    text-align: center;
+    font-size: 25px;
+    line-height: 25px;
+    margin: 1px;
+}
+
+.snake_info > .number {
+    font-size: 20px;
+    vertical-align: top;
+    display: inline-block;
+    margin-left: 25px;
+    color: #CCCCCC;
+}

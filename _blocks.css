@@ -1,0 +1,30 @@
+.block {
+    vertical-align: top;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    font-size: 20px;
+    line-height: 20px;
+    margin: 1px;
+}
+
+.ground {
+    background: #181818;
+}
+
+.green_head {
+    background: lime;
+}
+
+.green_body {
+    background: green;
+}
+
+.yellow_head {
+    background: yellow;
+}
+
+.yellow_body {
+    background: rgb(150, 150, 0);
+}

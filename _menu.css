@@ -1,0 +1,117 @@
+#main_menu {
+    display: none;
+    font-size: 0px;
+    margin: auto;
+    margin-top: 100px;
+    width: 280px;
+    height: 350px;
+    padding: 20px;
+    background: #222222;
+    border-radius: 10px;
+}
+
+.big_block {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border-radius: 3px;
+}
+
+.logo_head {
+    background: lime;
+    margin-right: 10px;
+    margin-bottom: 3px;
+}
+
+.logo_body {
+    background: green;
+    margin-right: 3px;
+}
+
+#title {
+    display: inline-block;
+    vertical-align: top;
+    line-height: 50px;
+    font-size: 45px;
+    font-style: italic;
+    font-weight: bold;
+    color: #EEEEEE;
+}
+
+#zh_title {
+    display: inline-block;
+    vertical-align: top;
+    color: #EEEEEE;
+    font-size: 17px;
+    margin-left: 65px;
+}
+
+#mode_option {
+    margin-top: 20px;
+    background: black;
+    height: 200px;
+}
+
+#mode_name {
+    margin-top: 30px;
+    font-size: 23px;
+    color: #EEEEEE;
+    text-align: center;
+}
+
+.switch_mode {
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 20px;
+    text-align: center;
+    line-height: 80px;
+    width: 20px;
+    height: 80px;
+    font-size: 30px;
+    color: #888888;
+}
+
+.switch_mode:hover {
+    background: #444444;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#mode_caption {
+    display: inline-block;
+    margin-top: 20px;
+    width: 240px;
+    height: 80px;
+    font-size: 20px;
+    color: #EEEEEE;
+    text-align: center;
+    overflow: hidden;
+}
+
+/*#start_game_button {*/
+.button {
+    width: 100px;
+    height: 40px;
+    border-radius: 7px;
+    background: #444444;
+    margin: auto;
+    margin-top: 25px;
+    text-align: center;
+    line-height: 40px;
+    font-size: 20px;
+    color: #EEEEEE;
+}
+
+.button:hover {
+    background: #666666;
+    cursor: pointer;
+}
+
+#author_name {
+    margin-top: 15px;
+    font-size: 15px;
+    text-align: right;
+    font-style: italic;
+    font-weight: bold;
+    color: #EEEEEE;
+}
