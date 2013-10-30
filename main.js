@@ -7,9 +7,11 @@ var interface_init = function () {
 var panel_init = function () {
    var s1 = gen_snake_info_panel("↑←↓→", 'green');
    var s2 = gen_snake_info_panel("wads", 'yellow');
+   var game_mode_prompt = '<div class="game_mode">遊戲模式</div>';
+   var game_mode_field  = '<div class="game_mode">[ <span id="game_mode">經典</span> ]</div>';
    var reset_button = '<div class="button">reset</div>';
    var main_menu_button = '<div class="button">主選單</div>';
-   $('#info').html(s1 + s2 + reset_button + main_menu_button);
+   $('#info').html(s1 + s2 + game_mode_prompt + game_mode_field + reset_button + main_menu_button);
 };
 
 var gen_snake_info_panel = function (dir, color) {

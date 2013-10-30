@@ -1,3 +1,4 @@
+/* This file contains things that used in many place */
 html, body {
     background: black;
     font-family: consolas, 微軟正黑體;
@@ -10,4 +11,22 @@ html, body {
 .block {
     width: 20px;
     height: 20px;
+}
+
+.button {
+    width: 100px;
+    height: 40px;
+    border-radius: 7px;
+    background: #444444;
+    margin: auto;
+    margin-top: 25px;
+    text-align: center;
+    line-height: 40px;
+    font-size: 20px;
+    color: #EEEEEE;
+}
+
+.button:hover {
+    background: #666666;
+    cursor: pointer;
 }

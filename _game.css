@@ -1,3 +1,4 @@
+/* This file contains things that only appears in game */
 #game_field {
     width: 751px;
     height: 550px;
@@ -49,4 +50,10 @@
     display: inline-block;
     margin-left: 25px;
     color: #CCCCCC;
+}
+
+.game_mode {
+    font-size:20px;
+    text-align:center;
+    color:#CCCCCC;
 }

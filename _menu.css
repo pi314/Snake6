@@ -1,3 +1,4 @@
+/* This file contains things that only appears in main menu */
 #main_menu {
     display: none;
     font-size: 0px;
@@ -86,25 +87,6 @@
     color: #EEEEEE;
     text-align: center;
     overflow: hidden;
-}
-
-/*#start_game_button {*/
-.button {
-    width: 100px;
-    height: 40px;
-    border-radius: 7px;
-    background: #444444;
-    margin: auto;
-    margin-top: 25px;
-    text-align: center;
-    line-height: 40px;
-    font-size: 20px;
-    color: #EEEEEE;
-}
-
-.button:hover {
-    background: #666666;
-    cursor: pointer;
 }
 
 #author_name {

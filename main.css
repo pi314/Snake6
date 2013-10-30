@@ -1,3 +1,4 @@
+/* This file contains things that used in many place */
 html, body {
     background: black;
     font-family: consolas, 微軟正黑體;
@@ -11,6 +12,25 @@ html, body {
     width: 20px;
     height: 20px;
 }
+
+.button {
+    width: 100px;
+    height: 40px;
+    border-radius: 7px;
+    background: #444444;
+    margin: auto;
+    margin-top: 25px;
+    text-align: center;
+    line-height: 40px;
+    font-size: 20px;
+    color: #EEEEEE;
+}
+
+.button:hover {
+    background: #666666;
+    cursor: pointer;
+}
+/* This file contains things that only appears in main menu */
 #main_menu {
     display: none;
     font-size: 0px;
@@ -101,25 +121,6 @@ html, body {
     overflow: hidden;
 }
 
-/*#start_game_button {*/
-.button {
-    width: 100px;
-    height: 40px;
-    border-radius: 7px;
-    background: #444444;
-    margin: auto;
-    margin-top: 25px;
-    text-align: center;
-    line-height: 40px;
-    font-size: 20px;
-    color: #EEEEEE;
-}
-
-.button:hover {
-    background: #666666;
-    cursor: pointer;
-}
-
 #author_name {
     margin-top: 15px;
     font-size: 15px;
@@ -128,6 +129,7 @@ html, body {
     font-weight: bold;
     color: #EEEEEE;
 }
+/* This file contains things that only appears in game */
 #game_field {
     width: 751px;
     height: 550px;
@@ -179,6 +181,12 @@ html, body {
     display: inline-block;
     margin-left: 25px;
     color: #CCCCCC;
+}
+
+.game_mode {
+    font-size:20px;
+    text-align:center;
+    color:#CCCCCC;
 }
 .block {
     vertical-align: top;
