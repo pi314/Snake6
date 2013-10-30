@@ -5,9 +5,9 @@
 .   加上 .gitignore
 
 .   加上遊戲模式提示，介面暫定完成
-    先開始製作經典模式
+    先製作經典模式
 
-.   想起 KeyManager 的 scroll 有問題，已修正並加入 namespace 機制
+.   想起 KeyManager 的 scroll 有問題，修正
 
 20131023
 ==========

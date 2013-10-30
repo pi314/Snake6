@@ -1,3 +1,4 @@
+/* "Don't know where to put" functions */
 var interface_init = function () {
     panel_init();
     field_init();
@@ -42,3 +43,17 @@ var field_init = function () {
     }
     $('#field').html(ss);
 };
+
+var set_state = function (new_state) {
+    STATE = new_state;
+    switch (STATE) {
+    case 'MENU':
+        $('#main_menu').css('display', 'block');
+        $('#game_field').css('display', 'none');
+        break;
+    case 'GAME':
+        $('#main_menu').css('display', 'none');
+        $('#game_field').css('display', 'block');
+        break;
+    }
+}

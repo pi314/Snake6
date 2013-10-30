@@ -1,5 +1,6 @@
 /* This file contains things that only appears in game */
 #game_field {
+    display: none;
     width: 751px;
     height: 550px;
     background: #111111;
