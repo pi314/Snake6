@@ -179,6 +179,22 @@ html, body {
     margin: 1px;
 }
 
+.control_source_AI {
+    display:none;
+    color: #666666;
+    font-size: 23px;
+    margin-top: 13px;
+    margin-left: 20px;
+}
+
+.control_source_none {
+    display:none;
+    color: #666666;
+    font-size: 23px;
+    margin-top: 13px;
+    margin-left: 8px;
+}
+
 .snake_info > .number {
     font-size: 20px;
     vertical-align: top;

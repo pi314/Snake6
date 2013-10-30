@@ -1,4 +1,6 @@
-/* "Don't know where to put" functions */
+/* General Used functions and variables */
+var STATE = 'MENU';
+
 var interface_init = function () {
     panel_init();
     field_init();
@@ -22,11 +24,19 @@ var gen_snake_info_panel = function (dir, color) {
    s += '<div class="block ' + color + '_head"></div>';
    s += '<span class="number">3</span>';
    s += '<br>';
+   s += '<div class="control_source_player">';
    s += '<div class="control"></div>';
    s += '<div class="control">' + dir[0] + '</div><br>';
    s += '<div class="control">' + dir[1] + '</div>';
    s += '<div class="control">' + dir[2] + '</div>';
    s += '<div class="control">' + dir[3] + '</div><br>';
+   s += '</div>';
+   s += '<div class="control_source_AI">';
+   s += 'AI';
+   s += '</div>';
+   s += '<div class="control_source_none">';
+   s += 'None';
+   s += '</div>';
    s += '</div>';
    return s;
 };
