@@ -4,6 +4,8 @@
 
 .   小更改 html id 命名方式，使用 #id.button 來代表 button
 
+.   做好主選單按鈕事件
+
 20131030
 ==========
 .   放上 github，做好 README.md
