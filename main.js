@@ -63,7 +63,11 @@ var set_state = function (new_state) {
         $('#game_field').css('display', 'block');
         break;
     }
-}
+};
+
+var back2menu = function () {
+    set_state('MENU');
+};
 /* Game engine related functions and variables */
 var control_source = ['PLAYER', 'PLAYER'];
 
@@ -100,6 +104,8 @@ var set_control_source = function () {
 
     set_state('GAME');
 
-    $('#start_game_button').click(enter_game);
+    $('#start_game.button').click(enter_game);
+    $('#reset.button').click(function () {});
+    $('#back2menu.button').click(back2menu);
     $('.snake_info').click(set_control_source);
 });

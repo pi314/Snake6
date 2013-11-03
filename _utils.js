@@ -62,4 +62,8 @@ var set_state = function (new_state) {
         $('#game_field').css('display', 'block');
         break;
     }
-}
+};
+
+var back2menu = function () {
+    set_state('MENU');
+};

@@ -1,3 +1,9 @@
+20131103
+==========
+.   把 info_field 裡面 hard-coded HTML 從 js 移到 html 中
+
+.   小更改 html id 命名方式，使用 #id.button 來代表 button
+
 20131030
 ==========
 .   放上 github，做好 README.md
