@@ -142,7 +142,7 @@ html, body {
     font-size: 0px;
 }
 
-#info {
+#info_field {
     display: inline-block;
     vertical-align: top;
     margin-right: 1px;
@@ -195,12 +195,19 @@ html, body {
     margin-left: 8px;
 }
 
+#snake_info_panel {
+}
+
 .snake_info > .number {
     font-size: 20px;
     vertical-align: top;
     display: inline-block;
     margin-left: 25px;
     color: #CCCCCC;
+}
+
+#game_mode_block {
+    margin: 40px 0px;
 }
 
 .game_mode {

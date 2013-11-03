@@ -10,11 +10,7 @@ var interface_init = function () {
 var panel_init = function () {
    var s1 = gen_snake_info_panel("↑←↓→", 'green');
    var s2 = gen_snake_info_panel("wads", 'yellow');
-   var game_mode_prompt = '<div class="game_mode">遊戲模式</div>';
-   var game_mode_field  = '<div class="game_mode">[ <span id="game_mode">經典</span> ]</div>';
-   var reset_button = '<div class="button">reset</div>';
-   var main_menu_button = '<div class="button">主選單</div>';
-   $('#info').html(s1 + s2 + game_mode_prompt + game_mode_field + reset_button + main_menu_button);
+   $('#snake_info_panel').html(s1 + s2);
 };
 
 var gen_snake_info_panel = function (dir, color) {
@@ -73,6 +69,7 @@ var control_source = ['PLAYER', 'PLAYER'];
 
 var enter_game = function () {
     set_state('GAME');
+    /* snake position initialize to map upper right and lower down*/
 };
 
 var set_control_source = function () {

@@ -3,6 +3,7 @@ var control_source = ['PLAYER', 'PLAYER'];
 
 var enter_game = function () {
     set_state('GAME');
+    /* snake position initialize to map upper right and lower down*/
 };
 
 var set_control_source = function () {
