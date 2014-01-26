@@ -1,7 +1,4 @@
 $(function () {
-/* General Used functions and variables */
-var STATE = 'MENU';
-
 var interface_init = function () {
     panel_init();
     field_init();
@@ -38,20 +35,25 @@ var gen_snake_info_panel = function (dir, color) {
    return s;
 };
 
+var MAP_WIDTH = 25;
+var MAP_HEIGHT = 25;
+
 var field_init = function () {
     var s = '';
-    for (var a = 0; a < 25; a++) {
-        s += '<div class="block ground"></div>';
+    for (var a = 0; a < MAP_HEIGHT; a++) {
+        for (var b = 0; b < MAP_WIDTH; b++) {
+            s += '<div class="block ground" id="block_'+a+'_'+b+'"></div>';
+        }
+        s += '<br>';
     }
-    s += '<br>';
-    var ss = '';
-    for (var a = 0; a < 25; a++) {
-        ss += s;
-    }
-    $('#field').html(ss);
+    $('#field').html(s);
 };
 
+/* General Used functions and variables */
+var STATE = 'MENU';
+
 var set_state = function (new_state) {
+    /* states: MENU, GAME */
     STATE = new_state;
     switch (STATE) {
     case 'MENU':
@@ -65,41 +67,99 @@ var set_state = function (new_state) {
     }
 };
 
-var back2menu = function () {
-    set_state('MENU');
-};
-/* Game engine related functions and variables */
-var control_source = ['PLAYER', 'PLAYER'];
-
 var enter_game = function () {
     set_state('GAME');
     /* snake position initialize to map upper right and lower down*/
 };
 
+var back2menu = function () {
+    set_state('MENU');
+};
+/* Game engine related functions and variables */
+var MAP_WIDTH = 25;
+var MAP_HEIGHT = 25;
+
+var data2css_mapping = {
+    'SY': 'yellow_head',
+    'sY': 'yellow_body',
+    'sy': 'yellow_body',
+    'SG': 'green_head',
+    'sG': 'green_body',
+    'sg': 'green_body',
+    '..': 'ground',
+};
+
+var set_map_raw_data = function (row, col, data) {
+    if (0 <= row && row <= MAP_HEIGHT && 0 <= col && col <= MAP_WIDTH) {
+        map[row][col] = data;
+        $('#block_'+row+'_'+col).attr('class',
+            'block '+data2css_mapping[ data[0]+data[1] ] );
+    }
+};
+
+var map = [];
+for (var a = 0; a < MAP_HEIGHT; a++) {
+    map[a] = [];
+    for (var b = 0; b < MAP_WIDTH; b++) {
+        map[a][b] = '...';
+    }
+}
+var get_snake = function (hx, hy, tx, ty) {
+    var new_snake = {};
+    new_snake.head = {};
+    new_snake.head.x = hx;
+    new_snake.head.y = hy;
+    new_snake.tail = {};
+    new_snake.tail.x = tx;
+    new_snake.tail.y = ty;
+    new_snake.control_source = 'PLAYER';
+    new_snake.queue = [];
+    return new_snake;
+};
+
+var snake = [
+        get_snake(MAP_WIDTH-3, 0,  MAP_WIDTH-1, 0),
+        get_snake(2, MAP_HEIGHT-1,  0, MAP_HEIGHT-1),
+    ];
+
+$(function () {
+    // set yellow snake initial position
+    set_map_raw_data(snake[0].head.y, snake[0].head.x  , 'SYL');
+    set_map_raw_data(snake[0].head.y, snake[0].head.x+1, 'sYL');
+    set_map_raw_data(snake[0].head.y, snake[0].head.x+2, 'syL');
+
+    // set green snake initial position
+    set_map_raw_data(snake[1].head.y, snake[1].head.x  , 'SGR');
+    set_map_raw_data(snake[1].head.y, snake[1].head.x-1, 'sGR');
+    set_map_raw_data(snake[1].head.y, snake[1].head.x-2, 'sgR');
+});
+
 var set_control_source = function () {
     console.log(this);
     var snake_index = $('.snake_info').index(this);
     console.log(snake_index);
-    console.log(control_source[snake_index]);
+    console.log(snake[snake_index].control_source);
 
-    switch (control_source[snake_index]) {
+    switch (snake[snake_index].control_source) {
     case 'PLAYER':
         $(this).children('.control_source_player').css('display', 'none');
         $(this).children('.control_source_AI').css('display', 'block');
-        control_source[snake_index] = 'AI';
+        snake[snake_index].control_source = 'AI';
         break;
     case 'AI':
         $(this).children('.control_source_AI').css('display', 'none');
         $(this).children('.control_source_none').css('display', 'block');
-        control_source[snake_index] = 'NONE';
+        snake[snake_index].control_source = 'NONE';
         break;
     case 'NONE':
         $(this).children('.control_source_none').css('display', 'none');
         $(this).children('.control_source_player').css('display', 'block');
-        control_source[snake_index] = 'PLAYER';
+        snake[snake_index].control_source = 'PLAYER';
         break;
     }
 }
+
+
     interface_init();
 
     set_state('GAME');

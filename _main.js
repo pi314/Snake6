@@ -1,9 +1,13 @@
 $(function () {
+#_user_interface.js
 #_utils.js
-#_game.js
+#_game_map.js
+#_game_snake.js
+
     interface_init();
 
-    set_state('GAME');
+    //set_state('MENU');
+    set_state('GAME_PAUSE');
 
     $('#start_game.button').click(enter_game);
     $('#reset.button').click(function () {});

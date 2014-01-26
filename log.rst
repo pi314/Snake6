@@ -1,3 +1,31 @@
+20140126
+========
+
+-   把 _game.js 切成 _game_snake.js 和 _game_map.js
+
+-   把兩蛇的資料各自做成 object
+
+-   把蛇的初始位置設定好, 並畫在地圖上,
+    但最外層的 $(function) 沒有 document.ready 的效果, 原因未知
+
+-   規畫 state transition
+
+    ::
+
+        .  +------------------------------+
+           |       call back2menu()       |
+           v                              |
+        +------+ call enter_game()  +-----+------+
+        | MENU |------------------->| GAME_PAUSE |
+        +------+                    +--+---------+
+           ^                           |      ^
+           |                           |      | press space
+           |               press space |      |
+           |                           v      |
+           |  call back2menu()      +---------+--+
+           +------------------------|  GAME_ING  |
+                                    +------------+
+
 20131124
 ==========
 -   [idea] 兩條蛇有獨立的按鍵 queue
