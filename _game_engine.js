@@ -8,6 +8,7 @@ var init = function () {
 
 var reset = function () {
     field_init();
+    $('.snake_info > .number').text('3');
     construct_snake();
     construct_map();
     put_snake_on_map();

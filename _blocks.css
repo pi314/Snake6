@@ -39,5 +39,6 @@
 }
 
 .cube {
-    background: chocolate;
+    background: rgb(170, 80, 15); /* chocolate; */
+    border-radius: 4px;
 }

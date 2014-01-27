@@ -251,9 +251,6 @@ var move_tail = function (index) {
     var dir_row = map[tr][tc].row;
     var dir_col = map[tr][tc].col;
 
-    if (index == 0)
-        console.log(dir_row, dir_col);
-
     tr = (tr + dir_row + MAP_HEIGHT) % MAP_HEIGHT;
     tc = (tc + dir_col + MAP_WIDTH ) % MAP_WIDTH;
 
@@ -272,6 +269,12 @@ var move_head = function (index) {
         var move_vector = parse_direction( snake[index].queue.shift() );
         move_row = move_vector.row;
         move_col = move_vector.col;
+
+        if (move_row == -snake[index].dir.row &&
+            move_col == -snake[index].dir.col) {
+            move_row = snake[index].dir.row;
+            move_col = snake[index].dir.col;
+        }
     }
 
     var hr = snake[index].head.row;
@@ -298,6 +301,7 @@ var move_head = function (index) {
         break;
     case 'cube':
         snake[index].grow = true;
+        $($('.snake_info > .number')[index]).text(snake[index].length + 2);
         put_cube();
         break;
     }
@@ -337,6 +341,7 @@ var init = function () {
 
 var reset = function () {
     field_init();
+    $('.snake_info > .number').text('3');
     construct_snake();
     construct_map();
     put_snake_on_map();
