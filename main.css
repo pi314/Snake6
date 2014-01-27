@@ -228,6 +228,7 @@ html, body {
 
 .ground {
     background: #181818;
+    color: lightgray;
 }
 
 .green_head {
@@ -238,10 +239,18 @@ html, body {
     background: green;
 }
 
+.green_tail {
+    background: green;
+}
+
 .yellow_head {
     background: yellow;
 }
 
 .yellow_body {
+    background: rgb(150, 150, 0);
+}
+
+.yellow_tail {
     background: rgb(150, 150, 0);
 }

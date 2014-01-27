@@ -48,3 +48,17 @@ var field_init = function () {
     $('#field').html(s);
 };
 
+var message_row = 8;
+var show_pause_message = function () {
+    var message = '請按空白鍵開始遊戲';
+    var padding_left = (MAP_WIDTH - message.length) / 2;
+    for (var a = 0; a < message.length; a++) {
+        $('#block_'+message_row+'_'+(a+padding_left)).text(message[a]);
+    }
+};
+
+var clear_pause_message = function () {
+    for (var a = 0; a < MAP_WIDTH; a++) {
+        $('#block_'+message_row+'_'+a).text('');
+    }
+}

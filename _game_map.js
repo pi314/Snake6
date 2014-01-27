@@ -1,6 +1,7 @@
 /* Game engine related functions and variables */
 var MAP_WIDTH = 25;
 var MAP_HEIGHT = 25;
+var map = [];
 
 var data2css_mapping = {
     'SY': 'yellow_head',
@@ -12,18 +13,31 @@ var data2css_mapping = {
     '..': 'ground',
 };
 
-var set_map_raw_data = function (row, col, data) {
+var set_map_data = function (row, col, data) {
     if (0 <= row && row <= MAP_HEIGHT && 0 <= col && col <= MAP_WIDTH) {
-        map[row][col] = data;
-        $('#block_'+row+'_'+col).attr('class',
-            'block '+data2css_mapping[ data[0]+data[1] ] );
+        for (i in data) {
+            map[row][col][i] = data[i];
+        }
+        var target_element = $('#block_'+row+'_'+col);
+        switch (data.type) {
+        case 'head':
+        case 'body':
+        case 'tail':
+            target_element.attr('class', 'block '+ map[row][col].color + '_' + map[row][col].type);
+            break;
+        case 'ground':
+            target_element.attr('class', 'block ground');
+        }
     }
 };
 
-var map = [];
-for (var a = 0; a < MAP_HEIGHT; a++) {
-    map[a] = [];
-    for (var b = 0; b < MAP_WIDTH; b++) {
-        map[a][b] = '...';
+var construct_map = function () {
+    for (var a = 0; a < MAP_HEIGHT; a++) {
+        map[a] = [];
+        for (var b = 0; b < MAP_WIDTH; b++) {
+            map[a][b] = {
+                    type: 'ground',
+                };
+        }
     }
-}
+};

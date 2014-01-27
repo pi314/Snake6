@@ -1,3 +1,26 @@
+20140127
+========
+
+-   把初始化的步驟再細分成數個函式
+
+-   製作移動尾巴的函式, 邊界開放
+
+-   為蛇增加 dir, length, color 屬性
+
+-   地圖資料改用 json object 儲存 ::
+    
+    {
+        type: head/body/body_jump/tail/portal/cube/empty/ground/wall,
+        color: green/yellow,
+        row: 1/0/-1,
+        col: 1/0/-1,
+        data: (number),
+    }
+
+-   把 set_map_raw_data 更名為 set_map_data
+
+-   製作移動頭的函式, 邊界開放
+
 20140126
 ========
 
