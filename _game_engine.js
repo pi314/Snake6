@@ -1,5 +1,6 @@
 var timer = 0;
-var time_unit = 300;
+var time_unit = 50;
+var snake_wait = 0;
 
 var init = function () {
     interface_init();
@@ -17,13 +18,16 @@ var reset = function () {
 
 var start_timer = function () {
     timer = setInterval(function () {
-        for (var a = 0; a < snake.length; a++) {
-            move_tail(a);
-        }
+        if (snake_wait == 0) {
+            for (var a = 0; a < snake.length; a++) {
+                move_tail(a);
+            }
 
-        for (var a = 0; a < snake.length; a++) {
-            move_head(a);
+            for (var a = 0; a < snake.length; a++) {
+                move_head(a);
+            }
         }
+        snake_wait = (snake_wait + 1) % 6;
     }, time_unit);
 };
 
