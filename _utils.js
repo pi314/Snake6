@@ -13,9 +13,12 @@ var set_state = function (new_state) {
         $('#main_menu').css('display', 'block');
         $('#game_field').css('display', 'none');
         break;
-    case 'GAME_PAUSE':
+    case 'GAME_RESET':
         $('#main_menu').css('display', 'none');
         $('#game_field').css('display', 'block');
+        reset();
+    case 'GAME_PAUSE':
+    case 'GAME_END':
         show_pause_message();
         stop_timer();
         break;
@@ -27,17 +30,10 @@ var set_state = function (new_state) {
 };
 
 var enter_game = function () {
-    set_state('GAME_PAUSE');
+    set_state('GAME_RESET');
     /* snake position initialize to map upper right and lower down*/
 };
 
 var back2menu = function () {
     set_state('MENU');
-};
-
-var vector2symbol = function (row, col) {
-    if (row == 0) {
-        return col == -1? 'L' : 'R';
-    }
-    return row == -1? 'U' : 'D';
 };

@@ -13,6 +13,7 @@ var get_snake = function (color, hr, hc, tr, tc, dr, dc) {
     new_snake.dir = {};
     new_snake.dir.col = dc;
     new_snake.dir.row = dr;
+    new_snake.grow = false;
     return new_snake;
 };
 
@@ -24,14 +25,6 @@ var construct_snake = function () {
         get_snake('green',  0, MAP_WIDTH-3,   0, MAP_WIDTH-1,   0, -1),
         get_snake('yellow', MAP_HEIGHT-1, 2,  MAP_HEIGHT-1, 0,  0, 1),
     ];
-};
-
-var get_snake_head_data = function (index) {
-    var dir  = vector2symbol(snake[index].head.row, snake[index].head.col);
-    switch (snake[index].color) {
-    case 'green':  return 'SG' + dir;
-    case 'yellow': return 'SY' + dir;
-    }
 };
 
 var put_snake_on_map = function () {
@@ -108,11 +101,18 @@ var set_control_source = function () {
 };
 
 var move_tail = function (index) {
+    if (snake[index].grow) {
+        snake[index].grow = false;
+        return;
+    }
     var tr = snake[index].tail.row;
     var tc = snake[index].tail.col;
 
     var dir_row = map[tr][tc].row;
     var dir_col = map[tr][tc].col;
+
+    if (index == 0)
+        console.log(dir_row, dir_col);
 
     tr = (tr + dir_row + MAP_HEIGHT) % MAP_HEIGHT;
     tc = (tc + dir_col + MAP_WIDTH ) % MAP_WIDTH;
@@ -129,29 +129,48 @@ var move_head = function (index) {
     var move_col = snake[index].dir.col;
 
     if (snake[index].queue.length > 0) {
-        var move_vector = parse_direction( snake[index].queue.pop() );
+        var move_vector = parse_direction( snake[index].queue.shift() );
         move_row = move_vector.row;
         move_col = move_vector.col;
     }
 
-    // check collision here
-
     var hr = snake[index].head.row;
     var hc = snake[index].head.col;
 
-    set_map_data(snake[index].head.row, snake[index].head.col, {type: 'body'});
+    set_map_data(snake[index].head.row, snake[index].head.col,
+        {   type: 'body',
+            row:    move_row,
+            col:    move_col,
+            });
 
     hr = (hr + move_row + MAP_HEIGHT) % MAP_HEIGHT;
     hc = (hc + move_col + MAP_WIDTH ) % MAP_WIDTH;
 
+    // check collision here
+    switch (map[hr][hc].type) {
+    case 'head':
+    case 'body':
+    case 'body_jump':
+    case 'tail':
+    case 'wall':
+        set_state('GAME_END');
+        return;
+        break;
+    case 'cube':
+        snake[index].grow = true;
+        put_cube();
+        break;
+    }
+
     snake[index].head.row = hr;
     snake[index].head.col = hc;
+
+    snake[index].dir.row = move_row;
+    snake[index].dir.col = move_col;
 
     set_map_data(snake[index].head.row, snake[index].head.col,
         {   type:   'head',
             color:  snake[index].color,
-            row:    move_row,
-            col:    move_col,
             });
     snake[index].length += 1;
 };
@@ -163,4 +182,8 @@ var parse_direction = function (key) {
     case 'RIGHT':   return {row:  0, col:  1};
     case 'DOWN':    return {row:  1, col:  0};
     }
+};
+
+var enqueue = function (index, key) {
+    snake[index].queue.push(key);
 };

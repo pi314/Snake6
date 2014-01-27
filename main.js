@@ -78,9 +78,12 @@ var set_state = function (new_state) {
         $('#main_menu').css('display', 'block');
         $('#game_field').css('display', 'none');
         break;
-    case 'GAME_PAUSE':
+    case 'GAME_RESET':
         $('#main_menu').css('display', 'none');
         $('#game_field').css('display', 'block');
+        reset();
+    case 'GAME_PAUSE':
+    case 'GAME_END':
         show_pause_message();
         stop_timer();
         break;
@@ -92,34 +95,17 @@ var set_state = function (new_state) {
 };
 
 var enter_game = function () {
-    set_state('GAME_PAUSE');
+    set_state('GAME_RESET');
     /* snake position initialize to map upper right and lower down*/
 };
 
 var back2menu = function () {
     set_state('MENU');
 };
-
-var vector2symbol = function (row, col) {
-    if (row == 0) {
-        return col == -1? 'L' : 'R';
-    }
-    return row == -1? 'U' : 'D';
-};
 /* Game engine related functions and variables */
 var MAP_WIDTH = 25;
 var MAP_HEIGHT = 25;
 var map = [];
-
-var data2css_mapping = {
-    'SY': 'yellow_head',
-    'sY': 'yellow_body',
-    'sy': 'yellow_body',
-    'SG': 'green_head',
-    'sG': 'green_body',
-    'sg': 'green_body',
-    '..': 'ground',
-};
 
 var set_map_data = function (row, col, data) {
     if (0 <= row && row <= MAP_HEIGHT && 0 <= col && col <= MAP_WIDTH) {
@@ -135,6 +121,9 @@ var set_map_data = function (row, col, data) {
             break;
         case 'ground':
             target_element.attr('class', 'block ground');
+            break;
+        case 'cube':
+            target_element.attr('class', 'block cube');
         }
     }
 };
@@ -164,6 +153,7 @@ var get_snake = function (color, hr, hc, tr, tc, dr, dc) {
     new_snake.dir = {};
     new_snake.dir.col = dc;
     new_snake.dir.row = dr;
+    new_snake.grow = false;
     return new_snake;
 };
 
@@ -175,14 +165,6 @@ var construct_snake = function () {
         get_snake('green',  0, MAP_WIDTH-3,   0, MAP_WIDTH-1,   0, -1),
         get_snake('yellow', MAP_HEIGHT-1, 2,  MAP_HEIGHT-1, 0,  0, 1),
     ];
-};
-
-var get_snake_head_data = function (index) {
-    var dir  = vector2symbol(snake[index].head.row, snake[index].head.col);
-    switch (snake[index].color) {
-    case 'green':  return 'SG' + dir;
-    case 'yellow': return 'SY' + dir;
-    }
 };
 
 var put_snake_on_map = function () {
@@ -259,11 +241,18 @@ var set_control_source = function () {
 };
 
 var move_tail = function (index) {
+    if (snake[index].grow) {
+        snake[index].grow = false;
+        return;
+    }
     var tr = snake[index].tail.row;
     var tc = snake[index].tail.col;
 
     var dir_row = map[tr][tc].row;
     var dir_col = map[tr][tc].col;
+
+    if (index == 0)
+        console.log(dir_row, dir_col);
 
     tr = (tr + dir_row + MAP_HEIGHT) % MAP_HEIGHT;
     tc = (tc + dir_col + MAP_WIDTH ) % MAP_WIDTH;
@@ -280,29 +269,48 @@ var move_head = function (index) {
     var move_col = snake[index].dir.col;
 
     if (snake[index].queue.length > 0) {
-        var move_vector = parse_direction( snake[index].queue.pop() );
+        var move_vector = parse_direction( snake[index].queue.shift() );
         move_row = move_vector.row;
         move_col = move_vector.col;
     }
 
-    // check collision here
-
     var hr = snake[index].head.row;
     var hc = snake[index].head.col;
 
-    set_map_data(snake[index].head.row, snake[index].head.col, {type: 'body'});
+    set_map_data(snake[index].head.row, snake[index].head.col,
+        {   type: 'body',
+            row:    move_row,
+            col:    move_col,
+            });
 
     hr = (hr + move_row + MAP_HEIGHT) % MAP_HEIGHT;
     hc = (hc + move_col + MAP_WIDTH ) % MAP_WIDTH;
 
+    // check collision here
+    switch (map[hr][hc].type) {
+    case 'head':
+    case 'body':
+    case 'body_jump':
+    case 'tail':
+    case 'wall':
+        set_state('GAME_END');
+        return;
+        break;
+    case 'cube':
+        snake[index].grow = true;
+        put_cube();
+        break;
+    }
+
     snake[index].head.row = hr;
     snake[index].head.col = hc;
+
+    snake[index].dir.row = move_row;
+    snake[index].dir.col = move_col;
 
     set_map_data(snake[index].head.row, snake[index].head.col,
         {   type:   'head',
             color:  snake[index].color,
-            row:    move_row,
-            col:    move_col,
             });
     snake[index].length += 1;
 };
@@ -315,8 +323,25 @@ var parse_direction = function (key) {
     case 'DOWN':    return {row:  1, col:  0};
     }
 };
+
+var enqueue = function (index, key) {
+    snake[index].queue.push(key);
+};
 var timer = 0;
 var time_unit = 300;
+
+var init = function () {
+    interface_init();
+    reset();
+};
+
+var reset = function () {
+    field_init();
+    construct_snake();
+    construct_map();
+    put_snake_on_map();
+    put_cube();
+};
 
 var start_timer = function () {
     timer = setInterval(function () {
@@ -334,31 +359,55 @@ var stop_timer = function () {
     clearInterval(timer);
 }
 
-    var init = function () {
-        interface_init();
-        construct_snake();
-        construct_map();
-        put_snake_on_map();
+var wasd2arrow = {
+    'w': 'UP',
+    'a': 'LEFT',
+    'd': 'RIGHT',
+    's': 'DOWN'
+};
 
-        set_state('GAME_PAUSE');
-    };
-
-    init();
-
-    $('#start_game.button').click(enter_game);
-    $('#reset.button').click(init);
-    $('#back2menu.button').click(back2menu);
-    $('.snake_info').click(set_control_source);
-
+var bind_keys = function () {
     KeyManager.keydown('SPACE', function () {
         switch (get_state()) {
-        case 'MENU': break;
+        case 'MENU':
+            break;
+        case 'GAME_RESET':
+            set_state('GAME_ING');
+            break;
         case 'GAME_PAUSE':
             set_state('GAME_ING');
             break;
         case 'GAME_ING':
             set_state('GAME_PAUSE');
             break;
+        case 'GAME_END':
+            set_state('GAME_RESET');
         }
+    }).keydown(['UP', 'LEFT', 'RIGHT', 'DOWN'], function (i) {
+        enqueue(0, i);
+    }).keydown(['wasd'], function (i) {
+        enqueue(1, wasd2arrow[i]);
     });
+};
+
+var put_cube = function () {
+    var row = 0, col = 0;
+    do {
+        row = Math.floor(Math.random() * MAP_HEIGHT);
+        col = Math.floor(Math.random() * MAP_WIDTH);
+    } while (map[row][col].type != 'ground');
+    set_map_data(row, col, {type: 'cube'});
+};
+
+    init();
+    set_state('GAME_RESET');
+
+    $('#start_game.button').click(enter_game);
+    $('#reset.button').click(function () {
+        set_state('GAME_RESET');
+    });
+    $('#back2menu.button').click(back2menu);
+    $('.snake_info').click(set_control_source);
+
+    bind_keys();
 });

@@ -3,16 +3,6 @@ var MAP_WIDTH = 25;
 var MAP_HEIGHT = 25;
 var map = [];
 
-var data2css_mapping = {
-    'SY': 'yellow_head',
-    'sY': 'yellow_body',
-    'sy': 'yellow_body',
-    'SG': 'green_head',
-    'sG': 'green_body',
-    'sg': 'green_body',
-    '..': 'ground',
-};
-
 var set_map_data = function (row, col, data) {
     if (0 <= row && row <= MAP_HEIGHT && 0 <= col && col <= MAP_WIDTH) {
         for (i in data) {
@@ -27,6 +17,9 @@ var set_map_data = function (row, col, data) {
             break;
         case 'ground':
             target_element.attr('class', 'block ground');
+            break;
+        case 'cube':
+            target_element.attr('class', 'block cube');
         }
     }
 };
