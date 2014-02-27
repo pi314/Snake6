@@ -409,14 +409,17 @@ var put_cube = function () {
 };
 
     init();
-    set_state('GAME_RESET');
+    set_state('MENU');
 
     $('#start_game.button').click(enter_game);
     $('#reset.button').click(function () {
         set_state('GAME_RESET');
     });
+
     $('#back2menu.button').click(back2menu);
     $('.snake_info').click(set_control_source);
+
+    $('#next_mode').click(next_mode);
 
     bind_keys();
 });
