@@ -15,9 +15,10 @@ $(function () {
     });
 
     $('#back2menu.button').click(back2menu);
-    $('.snake_info').click(set_control_source);
+    $('.snake_info').click(iter_control_source);
 
     $('#next_mode').click(next_mode);
+    $('#last_mode').click(last_mode);
 
     bind_keys();
 });

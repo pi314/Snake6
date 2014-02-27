@@ -2,6 +2,7 @@
 html, body {
     background: black;
     font-family: consolas, 微軟正黑體;
+    user-select: none;
 }
 
 #wrapper {
@@ -86,6 +87,7 @@ html, body {
 
 #mode_name {
     margin-top: 30px;
+    height: 27px;
     font-size: 23px;
     color: #EEEEEE;
     text-align: center;
@@ -109,7 +111,7 @@ html, body {
     cursor: pointer;
 }
 
-#mode_caption {
+#mode_description {
     display: inline-block;
     margin-top: 20px;
     width: 240px;
@@ -258,4 +260,11 @@ html, body {
 .cube {
     background: rgb(170, 80, 15); /* chocolate; */
     border-radius: 4px;
+}
+
+.portal {
+    background: magenta;
+    border-radius: 2px;
+    font-size: 19px;
+    font-weight: bold;
 }

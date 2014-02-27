@@ -1,6 +1,18 @@
-var timer = 0;
-var time_unit = 50;
-var snake_wait = 0;
+var TIME_UNIT = 50;
+var PORTAL_DURATION = 30;
+var timer;
+var snake_wait;
+var portal_timer_wait;
+var portal_timer;
+
+var portal_exists = false;
+var portal_pair = [
+        {row: '', col: ''},
+        {row: '', col: ''},
+    ];
+
+var wormhole = [
+    ];
 
 var init = function () {
     interface_init();
@@ -8,8 +20,16 @@ var init = function () {
 };
 
 var reset = function () {
+    stop_timer();
     field_init();
     $('.snake_info > .number').text('3');
+
+    timer = 0;
+    snake_wait = 0;
+    portal_timer_wait = 0;
+    portal_timer = 5;
+    portal_exists = false;
+
     construct_snake();
     construct_map();
     put_snake_on_map();
@@ -18,6 +38,7 @@ var reset = function () {
 
 var start_timer = function () {
     timer = setInterval(function () {
+
         if (snake_wait == 0) {
             for (var a = 0; a < snake.length; a++) {
                 move_tail(a);
@@ -27,8 +48,24 @@ var start_timer = function () {
                 move_head(a);
             }
         }
+
+        if (MODE_NAME[MODE] == 'SUPRISE' && portal_timer_wait == 0) {
+            portal_timer--;
+            display_portal_remain_time();
+            if (portal_timer <= 0) {
+                portal_timer = PORTAL_DURATION;
+                clean_portal();
+                put_portal();
+            }
+        }
+
         snake_wait = (snake_wait + 1) % 6;
-    }, time_unit);
+
+        if (MODE_NAME[MODE] == 'SUPRISE') {
+            portal_timer_wait = (portal_timer_wait + 1) % (1000 / TIME_UNIT);
+        }
+
+    }, TIME_UNIT);
 };
 
 var stop_timer = function () {
@@ -73,4 +110,79 @@ var put_cube = function () {
         col = Math.floor(Math.random() * MAP_WIDTH);
     } while (map[row][col].type != 'ground');
     set_map_data(row, col, {type: 'cube'});
+};
+
+var clean_portal = function () {
+    if (portal_exists == false) {
+        return;
+    }
+
+    var check_dir_row = [-1, 0, 1, 0];
+    var check_dir_col = [ 0, 1, 0,-1];
+
+    // clean wormholes, not tested yet
+    for (var b = 0; b < 2; b++) {
+        var row = portal_pair[b].row;
+        var col = portal_pair[b].col;
+        for (var a = 0; a < 4; a++) {
+            var tmp_row = (row + check_dir_row[a] + MAP_HEIGHT) % MAP_HEIGHT;
+            var tmp_col = (col + check_dir_col[a] + MAP_WIDTH) % MAP_WIDTH;
+            if (map[tmp_row][tmp_col].type == 'body-jump') {
+                clean_wormhole(map[tmp_row][tmp_col].data);
+            }
+        }
+    }
+
+    $('#block_' + portal_pair[0].row + '_' + portal_pair[0].col).text('');
+    $('#block_' + portal_pair[1].row + '_' + portal_pair[1].col).text('');
+
+    set_map_data(portal_pair[0].row, portal_pair[0].col, {type: 'ground'});
+    set_map_data(portal_pair[1].row, portal_pair[1].col, {type: 'ground'});
+};
+
+var put_portal = function () {
+    portal_exists = true;
+
+    var row;
+    var col;
+    do {
+        row = Math.floor(Math.random() * MAP_HEIGHT);
+        col = Math.floor(Math.random() * MAP_WIDTH);
+    } while (map[row][col].type != 'ground');
+
+    portal_pair[0].row = row;
+    portal_pair[0].col = col;
+
+    do {
+        row = Math.floor(Math.random() * MAP_HEIGHT);
+        col = Math.floor(Math.random() * MAP_WIDTH);
+    } while (map[row][col].type != 'ground');
+
+    portal_pair[1].row = row;
+    portal_pair[1].col = col;
+
+    set_map_data(portal_pair[0].row, portal_pair[0].col, {type: 'portal', data: 0});
+    set_map_data(portal_pair[1].row, portal_pair[1].col, {type: 'portal', data: 1});
+    display_portal_remain_time();
+};
+
+var clean_wormhole = function (wormhole_id) {
+    // cut snake here
+    delete wormhole[wormhole_id];
+};
+
+var get_wormhole = function (row, col) {
+    var a = 0;
+    while (wormhole[a] != undefined) {
+        a++;
+    }
+    wormhole[a] = {row: row, col: col};
+    return a;
+};
+
+var display_portal_remain_time = function () {
+    if (portal_exists) {
+        $('#block_' + portal_pair[0].row + '_' + portal_pair[0].col).text(portal_timer);
+        $('#block_' + portal_pair[1].row + '_' + portal_pair[1].col).text(portal_timer);
+    }
 };

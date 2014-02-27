@@ -26,6 +26,14 @@ TODO
 
 -   整理 game 相關 js 的檔名
 
+-   主選單加上驚喜模式的選項
+
+-   完成定時放置 portal 功能, 但 portal 實際功能尚未實作
+
+-   實作 portal 的穿越功能, 尚未實作切斷蛇的功能
+    在 snake 中新增一個屬性 in_portal, 記錄現在蛇正在穿過的 portal 數量
+
+-   調整 portal block 的外觀
 
 20140130
 ========
@@ -33,16 +41,16 @@ TODO
 -   [idea] 隱藏蛇
 
     -   白蛇
-        
-        -   空間跳躍: 按下與行進方向相同的鍵, 可以跳過一格 (算是加速
+
+        -   空間跳躍: 按下與行進方向相同的鍵, 可以跳過一格
 
         -   跳過 portal: 白蛇無法透過 portal 傳送, 而會直接跳躍過去
-    
+
     -   黑蛇
-        
+
         -   空間跳躍: 和白蛇相同
 
-        -   吃掉 portal: 黑蛇可以把 portal 吃掉, 但不會因此成長
+        -   破壞 portal: 黑蛇可以把 portal 吃掉, 但不會因此成長
 
 20140127
 ========
@@ -54,7 +62,7 @@ TODO
 -   為蛇增加 dir, length, color 屬性
 
 -   地圖資料改用 json object 儲存 ::
-    
+
     {
         type: head/body/body_jump/tail/portal/cube/empty/ground/wall,
         color: green/yellow,

@@ -54,6 +54,7 @@
 
 #mode_name {
     margin-top: 30px;
+    height: 27px;
     font-size: 23px;
     color: #EEEEEE;
     text-align: center;
@@ -77,7 +78,7 @@
     cursor: pointer;
 }
 
-#mode_caption {
+#mode_description {
     display: inline-block;
     margin-top: 20px;
     width: 240px;

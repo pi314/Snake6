@@ -15,11 +15,18 @@ var set_map_data = function (row, col, data) {
         case 'tail':
             target_element.attr('class', 'block '+ map[row][col].color + '_' + map[row][col].type);
             break;
+        case 'body-jump':
+            target_element.attr('class', 'block '+ map[row][col].color + '_' + 'body');
+            break;
         case 'ground':
             target_element.attr('class', 'block ground');
             break;
         case 'cube':
             target_element.attr('class', 'block cube');
+            break;
+        case 'portal':
+            target_element.attr('class', 'block portal');
+            break;
         }
     }
 };

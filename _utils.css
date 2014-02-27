@@ -2,6 +2,7 @@
 html, body {
     background: black;
     font-family: consolas, 微軟正黑體;
+    user-select: none;
 }
 
 #wrapper {

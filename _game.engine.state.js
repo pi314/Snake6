@@ -1,5 +1,15 @@
-/* General Used functions and variables */
 var STATE = 'MENU';
+
+/* Modes: CLASSIC, SUPRISE, TRON, (BATTLE_FIELD?) */
+var MODE_NAME = ['CLASSIC', 'SUPRISE', 'TRON'];
+
+var MODE = 0;
+
+var mode_descriptions = [
+        ['經典模式', '經典的吃方塊模式<br>以不斷長大為最高目標!', '經典'],
+        ['驚喜模式', '場上隨時會有傳送門<br>小心別在關門時進入!', '驚喜'],
+        ['TRON', '???', 'TRON'],
+    ];
 
 var get_state = function () {
     return STATE;
@@ -36,4 +46,18 @@ var enter_game = function () {
 
 var back2menu = function () {
     set_state('MENU');
+};
+
+var next_mode = function () {
+    MODE = (MODE + 1) % MODE_NAME.length;
+    $('#mode_name').html(mode_descriptions[MODE][0]);
+    $('#mode_description').html(mode_descriptions[MODE][1]);
+    $('#game_mode').html(mode_descriptions[MODE][2]);
+};
+
+var last_mode = function () {
+    MODE = (MODE - 1 + MODE_NAME.length) % MODE_NAME.length;
+    $('#mode_name').html(mode_descriptions[MODE][0]);
+    $('#mode_description').html(mode_descriptions[MODE][1]);
+    $('#game_mode').html(mode_descriptions[MODE][2]);
 };

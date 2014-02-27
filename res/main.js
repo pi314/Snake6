@@ -1,7 +1,13 @@
 $(function () {
 var interface_init = function () {
+    main_menu_init();
     panel_init();
     field_init();
+};
+
+var main_menu_init = function () {
+    $('#mode_name').html(mode_descriptions[MODE][0]);
+    $('#mode_description').html(mode_descriptions[MODE][1]);
 };
 
 var panel_init = function () {
@@ -63,8 +69,18 @@ var clear_pause_message = function () {
         $('#block_'+message_row+'_'+a).text('');
     }
 }
-/* General Used functions and variables */
 var STATE = 'MENU';
+
+/* Modes: CLASSIC, SUPRISE, TRON, (BATTLE_FIELD?) */
+var MODE_NAME = ['CLASSIC', 'SUPRISE', 'TRON'];
+
+var MODE = 0;
+
+var mode_descriptions = [
+        ['經典模式', '經典的吃方塊模式<br>以不斷長大為最高目標!', '經典'],
+        ['驚喜模式', '場上隨時會有傳送門<br>小心別在關門時進入!', '驚喜'],
+        ['TRON', '???', 'TRON'],
+    ];
 
 var get_state = function () {
     return STATE;
@@ -102,6 +118,20 @@ var enter_game = function () {
 var back2menu = function () {
     set_state('MENU');
 };
+
+var next_mode = function () {
+    MODE = (MODE + 1) % MODE_NAME.length;
+    $('#mode_name').html(mode_descriptions[MODE][0]);
+    $('#mode_description').html(mode_descriptions[MODE][1]);
+    $('#game_mode').html(mode_descriptions[MODE][2]);
+};
+
+var last_mode = function () {
+    MODE = (MODE - 1 + MODE_NAME.length) % MODE_NAME.length;
+    $('#mode_name').html(mode_descriptions[MODE][0]);
+    $('#mode_description').html(mode_descriptions[MODE][1]);
+    $('#game_mode').html(mode_descriptions[MODE][2]);
+};
 /* Game engine related functions and variables */
 var MAP_WIDTH = 25;
 var MAP_HEIGHT = 25;
@@ -119,11 +149,18 @@ var set_map_data = function (row, col, data) {
         case 'tail':
             target_element.attr('class', 'block '+ map[row][col].color + '_' + map[row][col].type);
             break;
+        case 'body-jump':
+            target_element.attr('class', 'block '+ map[row][col].color + '_' + 'body');
+            break;
         case 'ground':
             target_element.attr('class', 'block ground');
             break;
         case 'cube':
             target_element.attr('class', 'block cube');
+            break;
+        case 'portal':
+            target_element.attr('class', 'block portal');
+            break;
         }
     }
 };
@@ -154,6 +191,7 @@ var get_snake = function (color, hr, hc, tr, tc, dr, dc) {
     new_snake.dir.col = dc;
     new_snake.dir.row = dr;
     new_snake.grow = false;
+    new_snake.in_portal = 0;
     return new_snake;
 };
 
@@ -175,8 +213,8 @@ var put_snake_on_map = function () {
     set_map_data(snake[0].head.row, snake[0].head.col  ,
         {   type: 'head',
             color: color,
-            row:  dir_row,
-            col:  dir_col,
+            row: dir_row,
+            col: dir_col,
         });
     set_map_data(snake[0].head.row, snake[0].head.col+1,
         {   type: 'body',
@@ -196,7 +234,7 @@ var put_snake_on_map = function () {
     dir_row = 0;
     dir_col = 1;
     set_map_data(snake[1].head.row, snake[1].head.col  ,
-        {   type:  'head',
+        {   type: 'head',
             color: color,
             row: dir_row,
             col: dir_col,
@@ -204,7 +242,7 @@ var put_snake_on_map = function () {
     set_map_data(snake[1].head.row, snake[1].head.col-1,
         {   type: 'body',
             color: color,
-            row:dir_row,
+            row: dir_row,
             col: dir_col,
         });
     set_map_data(snake[1].head.row, snake[1].head.col-2,
@@ -215,7 +253,7 @@ var put_snake_on_map = function () {
         });
 };
 
-var set_control_source = function () {
+var iter_control_source = function () {
     console.log(this);
     var snake_index = $('.snake_info').index(this);
     console.log(snake_index);
@@ -241,23 +279,40 @@ var set_control_source = function () {
 };
 
 var move_tail = function (index) {
-    if (snake[index].grow) {
-        snake[index].grow = false;
+    if (snake[index].grow > 0) {
+        snake[index].grow--;
         return;
     }
     var tr = snake[index].tail.row;
     var tc = snake[index].tail.col;
+    
+    if (map[tr][tc].type == 'body-jump') {
+        var wormhole_id = map[tr][tc].data;
+        var connect_point = wormhole[wormhole_id];
+        console.log('wormhole_id:', wormhole_id);
+        console.log('connect point:', connect_point);
+        tr = connect_point.row;
+        tc = connect_point.col;
+        clean_wormhole(wormhole_id);
+    } else {
+        var dir_row = map[tr][tc].row;
+        var dir_col = map[tr][tc].col;
+        tr = (tr + dir_row + MAP_HEIGHT) % MAP_HEIGHT;
+        tc = (tc + dir_col + MAP_WIDTH ) % MAP_WIDTH;
+    }
 
-    var dir_row = map[tr][tc].row;
-    var dir_col = map[tr][tc].col;
-
-    tr = (tr + dir_row + MAP_HEIGHT) % MAP_HEIGHT;
-    tc = (tc + dir_col + MAP_WIDTH ) % MAP_WIDTH;
-
-    set_map_data(snake[index].tail.row, snake[index].tail.col, {type: 'ground'});
+    var old_tr = snake[index].tail.row;
+    var old_tc = snake[index].tail.col;
+    if (map[old_tr][old_tc].type == 'body-jump') {
+        clean_wormhole(map[old_tr][old_tc].data);
+        snake[index].in_portal -= 1;
+    }
+    set_map_data(old_tr, old_tc, {type: 'ground'});
     snake[index].tail.row = tr;
     snake[index].tail.col = tc;
-    set_map_data(snake[index].tail.row, snake[index].tail.col, {type: 'tail'});
+    if (map[tr][tc].type != 'body-jump') {
+        set_map_data(snake[index].tail.row, snake[index].tail.col, {type: 'tail'});
+    }
     snake[index].length -= 1;
 };
 
@@ -277,17 +332,35 @@ var move_head = function (index) {
         }
     }
 
-    var hr = snake[index].head.row;
-    var hc = snake[index].head.col;
+    var br = snake[index].head.row;
+    var bc = snake[index].head.col;
 
-    set_map_data(snake[index].head.row, snake[index].head.col,
+    set_map_data(br, bc,
         {   type: 'body',
-            row:    move_row,
-            col:    move_col,
+            row: move_row,
+            col: move_col,
             });
 
-    hr = (hr + move_row + MAP_HEIGHT) % MAP_HEIGHT;
-    hc = (hc + move_col + MAP_WIDTH ) % MAP_WIDTH;
+    var hr = (br + move_row + MAP_HEIGHT) % MAP_HEIGHT;
+    var hc = (bc + move_col + MAP_WIDTH ) % MAP_WIDTH;
+
+    // encounter a portal, transport first, check collision later
+    if (map[hr][hc].type == 'portal') {
+        var another_portal_id = 1 - map[hr][hc].data;
+        var another_portal_row = portal_pair[another_portal_id].row;
+        var another_portal_col = portal_pair[another_portal_id].col;
+        hr = (another_portal_row + move_row + MAP_HEIGHT) % MAP_HEIGHT;
+        hc = (another_portal_col + move_col + MAP_WIDTH ) % MAP_WIDTH;
+        var wormhole_id = get_wormhole(hr, hc);
+        console.log('get wormhole id:', wormhole_id);
+        set_map_data(br, bc,
+            {   type: 'body-jump',
+                data: wormhole_id
+                });
+        console.log(map[br][bc].type);
+        console.log(map[br][bc].data);
+        snake[index].in_portal += 1;
+    }
 
     // check collision here
     switch (map[hr][hc].type) {
@@ -300,7 +373,7 @@ var move_head = function (index) {
         return;
         break;
     case 'cube':
-        snake[index].grow = true;
+        snake[index].grow += 1;
         $($('.snake_info > .number')[index]).text(snake[index].length + 2);
         put_cube();
         break;
@@ -313,8 +386,8 @@ var move_head = function (index) {
     snake[index].dir.col = move_col;
 
     set_map_data(snake[index].head.row, snake[index].head.col,
-        {   type:   'head',
-            color:  snake[index].color,
+        {   type: 'head',
+            color: snake[index].color,
             });
     snake[index].length += 1;
 };
@@ -331,9 +404,21 @@ var parse_direction = function (key) {
 var enqueue = function (index, key) {
     snake[index].queue.push(key);
 };
-var timer = 0;
-var time_unit = 50;
-var snake_wait = 0;
+var TIME_UNIT = 50;
+var PORTAL_DURATION = 30;
+var timer;
+var snake_wait;
+var portal_timer_wait;
+var portal_timer;
+
+var portal_exists = false;
+var portal_pair = [
+        {row: '', col: ''},
+        {row: '', col: ''},
+    ];
+
+var wormhole = [
+    ];
 
 var init = function () {
     interface_init();
@@ -341,8 +426,16 @@ var init = function () {
 };
 
 var reset = function () {
+    stop_timer();
     field_init();
     $('.snake_info > .number').text('3');
+
+    timer = 0;
+    snake_wait = 0;
+    portal_timer_wait = 0;
+    portal_timer = 5;
+    portal_exists = false;
+
     construct_snake();
     construct_map();
     put_snake_on_map();
@@ -351,6 +444,7 @@ var reset = function () {
 
 var start_timer = function () {
     timer = setInterval(function () {
+
         if (snake_wait == 0) {
             for (var a = 0; a < snake.length; a++) {
                 move_tail(a);
@@ -360,8 +454,24 @@ var start_timer = function () {
                 move_head(a);
             }
         }
+
+        if (MODE_NAME[MODE] == 'SUPRISE' && portal_timer_wait == 0) {
+            portal_timer--;
+            display_portal_remain_time();
+            if (portal_timer <= 0) {
+                portal_timer = PORTAL_DURATION;
+                clean_portal();
+                put_portal();
+            }
+        }
+
         snake_wait = (snake_wait + 1) % 6;
-    }, time_unit);
+
+        if (MODE_NAME[MODE] == 'SUPRISE') {
+            portal_timer_wait = (portal_timer_wait + 1) % (1000 / TIME_UNIT);
+        }
+
+    }, TIME_UNIT);
 };
 
 var stop_timer = function () {
@@ -408,6 +518,80 @@ var put_cube = function () {
     set_map_data(row, col, {type: 'cube'});
 };
 
+var clean_portal = function () {
+    if (portal_exists == false) {
+        return;
+    }
+
+    var check_dir_row = [-1, 0, 1, 0];
+    var check_dir_col = [ 0, 1, 0,-1];
+
+    // cut snake, not tested yet
+    for (var b = 0; b < 2; b++) {
+        var row = portal_pair[b].row;
+        var col = portal_pair[b].col;
+        for (var a = 0; a < 4; a++) {
+            var tmp_row = (row + check_dir_row[a] + MAP_HEIGHT) % MAP_HEIGHT;
+            var tmp_col = (col + check_dir_col[a] + MAP_WIDTH) % MAP_WIDTH;
+            if (map[tmp_row][tmp_col].type == 'body-jump') {
+                clean_wormhole(map[tmp_row][tmp_col].data);
+            }
+        }
+    }
+
+    $('#block_' + portal_pair[0].row + '_' + portal_pair[0].col).text('');
+    $('#block_' + portal_pair[1].row + '_' + portal_pair[1].col).text('');
+
+    set_map_data(portal_pair[0].row, portal_pair[0].col, {type: 'ground'});
+    set_map_data(portal_pair[1].row, portal_pair[1].col, {type: 'ground'});
+};
+
+var put_portal = function () {
+    portal_exists = true;
+
+    var row;
+    var col;
+    do {
+        row = Math.floor(Math.random() * MAP_HEIGHT);
+        col = Math.floor(Math.random() * MAP_WIDTH);
+    } while (map[row][col].type != 'ground');
+
+    portal_pair[0].row = row;
+    portal_pair[0].col = col;
+
+    do {
+        row = Math.floor(Math.random() * MAP_HEIGHT);
+        col = Math.floor(Math.random() * MAP_WIDTH);
+    } while (map[row][col].type != 'ground');
+
+    portal_pair[1].row = row;
+    portal_pair[1].col = col;
+
+    set_map_data(portal_pair[0].row, portal_pair[0].col, {type: 'portal', data: 0});
+    set_map_data(portal_pair[1].row, portal_pair[1].col, {type: 'portal', data: 1});
+    display_portal_remain_time();
+};
+
+var clean_wormhole = function (wormhole_id) {
+    delete wormhole[wormhole_id];
+};
+
+var get_wormhole = function (row, col) {
+    var a = 0;
+    while (wormhole[a] != undefined) {
+        a++;
+    }
+    wormhole[a] = {row: row, col: col};
+    return a;
+};
+
+var display_portal_remain_time = function () {
+    if (portal_exists) {
+        $('#block_' + portal_pair[0].row + '_' + portal_pair[0].col).text(portal_timer);
+        $('#block_' + portal_pair[1].row + '_' + portal_pair[1].col).text(portal_timer);
+    }
+};
+
     init();
     set_state('MENU');
 
@@ -417,9 +601,10 @@ var put_cube = function () {
     });
 
     $('#back2menu.button').click(back2menu);
-    $('.snake_info').click(set_control_source);
+    $('.snake_info').click(iter_control_source);
 
     $('#next_mode').click(next_mode);
+    $('#last_mode').click(last_mode);
 
     bind_keys();
 });

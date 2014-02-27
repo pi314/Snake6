@@ -1,6 +1,12 @@
 var interface_init = function () {
+    main_menu_init();
     panel_init();
     field_init();
+};
+
+var main_menu_init = function () {
+    $('#mode_name').html(mode_descriptions[MODE][0]);
+    $('#mode_description').html(mode_descriptions[MODE][1]);
 };
 
 var panel_init = function () {
