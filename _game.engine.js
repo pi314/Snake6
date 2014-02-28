@@ -11,8 +11,9 @@ var portal_pair = [
         {row: '', col: ''},
     ];
 
-var wormhole = [
-    ];
+var wormhole = [];
+
+var deleted_wormhole = [];
 
 var init = function () {
     interface_init();
@@ -40,6 +41,8 @@ var start_timer = function () {
     timer = setInterval(function () {
 
         if (snake_wait == 0) {
+            move_dying_tail();
+
             for (var a = 0; a < snake.length; a++) {
                 move_tail(a);
             }
@@ -128,9 +131,16 @@ var clean_portal = function () {
             var tmp_row = (row + check_dir_row[a] + MAP_HEIGHT) % MAP_HEIGHT;
             var tmp_col = (col + check_dir_col[a] + MAP_WIDTH) % MAP_WIDTH;
             if (map[tmp_row][tmp_col].type == 'body-jump') {
-                clean_wormhole(map[tmp_row][tmp_col].data);
+                console.log('clean wormhole:', map[tmp_row][tmp_col].data);
+                close_wormhole(map[tmp_row][tmp_col].data);
             }
         }
+    }
+
+    // cut snake here
+    for (var a = 0; a < snake.length; a++) {
+        console.log('escaping tail', a);
+        escape_tail(a);
     }
 
     $('#block_' + portal_pair[0].row + '_' + portal_pair[0].col).text('');
@@ -166,8 +176,11 @@ var put_portal = function () {
     display_portal_remain_time();
 };
 
-var clean_wormhole = function (wormhole_id) {
-    // cut snake here
+var close_wormhole = function (wormhole_id) {
+    wormhole[wormhole_id].open = false;
+};
+
+var delete_wormhole = function (wormhole_id) {
     delete wormhole[wormhole_id];
 };
 
@@ -176,7 +189,7 @@ var get_wormhole = function (row, col) {
     while (wormhole[a] != undefined) {
         a++;
     }
-    wormhole[a] = {row: row, col: col};
+    wormhole[a] = {row: row, col: col, open: true};
     return a;
 };
 

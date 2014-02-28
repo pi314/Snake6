@@ -150,6 +150,7 @@ var set_map_data = function (row, col, data) {
             target_element.attr('class', 'block '+ map[row][col].color + '_' + map[row][col].type);
             break;
         case 'body-jump':
+        case 'body-end':
             target_element.attr('class', 'block '+ map[row][col].color + '_' + 'body');
             break;
         case 'ground':
@@ -160,6 +161,9 @@ var set_map_data = function (row, col, data) {
             break;
         case 'portal':
             target_element.attr('class', 'block portal');
+            break;
+        case 'wall':
+            target_element.attr('class', 'block wall');
             break;
         }
     }
@@ -175,6 +179,39 @@ var construct_map = function () {
         }
     }
 };
+
+var get_next_block = function (row, col) {
+    var nr;
+    var nc;
+    switch (map[row][col].type) {
+    case 'body-jump':
+        var wormhole_id = map[row][col].data;
+        var connect_point = wormhole[wormhole_id];
+        console.log('wormhole_id:', wormhole_id);
+        console.log('connect point:', connect_point);
+        nr = connect_point.row;
+        nc = connect_point.col;
+        break;
+    case 'body':
+    case 'tail':
+        var dir_row = map[row][col].row;
+        var dir_col = map[row][col].col;
+        nr = (row + dir_row + MAP_HEIGHT) % MAP_HEIGHT;
+        nc = (col + dir_col + MAP_WIDTH ) % MAP_WIDTH;
+        break;
+    case 'head':
+    case 'body-end':
+    case 'wall':
+    case 'cube':
+    case 'portal':
+    case 'ground':
+        nr = row;
+        nc = col;
+        break;
+    }
+    return {row: nr, col: nc};
+};
+
 var get_snake = function (color, hr, hc, tr, tc, dr, dc) {
     var new_snake = {};
     new_snake.color = color;
@@ -190,12 +227,13 @@ var get_snake = function (color, hr, hc, tr, tc, dr, dc) {
     new_snake.dir = {};
     new_snake.dir.col = dc;
     new_snake.dir.row = dr;
-    new_snake.grow = false;
-    new_snake.in_portal = 0;
+    new_snake.grow = 0;
+    new_snake.in_portal = [];
     return new_snake;
 };
 
-snake = [];
+var snake = [];
+var dying_tail = [];
 
 var construct_snake = function () {
     snake = [
@@ -283,29 +321,15 @@ var move_tail = function (index) {
         snake[index].grow--;
         return;
     }
-    var tr = snake[index].tail.row;
-    var tc = snake[index].tail.col;
+    var next_tail = get_next_block(snake[index].tail.row, snake[index].tail.col);
+    var tr = next_tail.row;
+    var tc = next_tail.col;
     
-    if (map[tr][tc].type == 'body-jump') {
-        var wormhole_id = map[tr][tc].data;
-        var connect_point = wormhole[wormhole_id];
-        console.log('wormhole_id:', wormhole_id);
-        console.log('connect point:', connect_point);
-        tr = connect_point.row;
-        tc = connect_point.col;
-        clean_wormhole(wormhole_id);
-    } else {
-        var dir_row = map[tr][tc].row;
-        var dir_col = map[tr][tc].col;
-        tr = (tr + dir_row + MAP_HEIGHT) % MAP_HEIGHT;
-        tc = (tc + dir_col + MAP_WIDTH ) % MAP_WIDTH;
-    }
-
     var old_tr = snake[index].tail.row;
     var old_tc = snake[index].tail.col;
     if (map[old_tr][old_tc].type == 'body-jump') {
-        clean_wormhole(map[old_tr][old_tc].data);
-        snake[index].in_portal -= 1;
+        close_wormhole(map[old_tr][old_tc].data);
+        snake[index].in_portal.shift();
     }
     set_map_data(old_tr, old_tc, {type: 'ground'});
     snake[index].tail.row = tr;
@@ -359,14 +383,15 @@ var move_head = function (index) {
                 });
         console.log(map[br][bc].type);
         console.log(map[br][bc].data);
-        snake[index].in_portal += 1;
+        snake[index].in_portal = snake[index].in_portal.concat([wormhole_id]);
     }
 
     // check collision here
     switch (map[hr][hc].type) {
     case 'head':
     case 'body':
-    case 'body_jump':
+    case 'body-jump':
+    case 'body-end':
     case 'tail':
     case 'wall':
         set_state('GAME_END');
@@ -404,6 +429,77 @@ var parse_direction = function (key) {
 var enqueue = function (index, key) {
     snake[index].queue.push(key);
 };
+
+var escape_tail = function (index) {
+    // new tail row/col
+    var ntr = snake[index].tail.row;
+    var ntc = snake[index].tail.col;
+
+    // iterator tail row/col
+    var itr = ntr;
+    var itc = ntc;
+
+    // find a safe tail position
+    while (true) {
+
+        console.log(itr, itc, map[itr][itc].type);
+        if (map[itr][itc].type == 'head') {
+            break;
+        } else if (map[itr][itc].type == 'body-jump') {
+
+            var tmp_pos = get_next_block(itr, itc);
+
+            if (wormhole[ map[itr][itc].data ].open == false) {
+                // connection point broken
+                add_dying_tail(ntr, ntc);
+                delete_wormhole(map[itr][itc].data);
+                set_map_data(itr, itc, {type: 'body-end'});
+                ntr = tmp_pos.row;
+                ntc = tmp_pos.col;
+                itr = ntr;
+                itc = ntc;
+            } else {
+                itr = tmp_pos.row;
+                itc = tmp_pos.col;
+            }
+
+        } else {
+            // nothing special, keep searching
+            var tmp_pos = get_next_block(itr, itc);
+            if (itr == tmp_pos.row && itc == tmp_pos.col) {
+                console.log('Error: the next block of (', itr, ',', itc, ') is itself.');
+            }
+            itr = tmp_pos.row;
+            itc = tmp_pos.col;
+        }
+    }
+    snake[index].tail.row = ntr;
+    snake[index].tail.col = ntc;
+};
+
+var add_dying_tail = function (row, col) {
+    dying_tail.push({row: row, col: col});
+};
+
+var move_dying_tail = function () {
+    var new_dying_tail = [];
+
+    for (var a = 0; a < dying_tail.length; a++) {
+        var dtr = dying_tail[a].row;
+        var dtc = dying_tail[a].col;
+        if (map[dtr][dtc].type == 'body-end') {
+            set_map_data(dtr, dtc, {type: 'wall'});
+        } else {
+            var tmp_pos = get_next_block(dtr, dtc);
+            set_map_data(dtr, dtc, {type: 'wall'});
+            dtr = tmp_pos.row;
+            dtc = tmp_pos.col;
+            new_dying_tail.push( {row: dtr, col: dtc} );
+        }
+    }
+
+    dying_tail = new_dying_tail;
+};
 var TIME_UNIT = 50;
 var PORTAL_DURATION = 30;
 var timer;
@@ -417,8 +513,9 @@ var portal_pair = [
         {row: '', col: ''},
     ];
 
-var wormhole = [
-    ];
+var wormhole = [];
+
+var deleted_wormhole = [];
 
 var init = function () {
     interface_init();
@@ -446,6 +543,8 @@ var start_timer = function () {
     timer = setInterval(function () {
 
         if (snake_wait == 0) {
+            move_dying_tail();
+
             for (var a = 0; a < snake.length; a++) {
                 move_tail(a);
             }
@@ -526,7 +625,7 @@ var clean_portal = function () {
     var check_dir_row = [-1, 0, 1, 0];
     var check_dir_col = [ 0, 1, 0,-1];
 
-    // cut snake, not tested yet
+    // clean wormholes, not tested yet
     for (var b = 0; b < 2; b++) {
         var row = portal_pair[b].row;
         var col = portal_pair[b].col;
@@ -534,9 +633,16 @@ var clean_portal = function () {
             var tmp_row = (row + check_dir_row[a] + MAP_HEIGHT) % MAP_HEIGHT;
             var tmp_col = (col + check_dir_col[a] + MAP_WIDTH) % MAP_WIDTH;
             if (map[tmp_row][tmp_col].type == 'body-jump') {
-                clean_wormhole(map[tmp_row][tmp_col].data);
+                console.log('clean wormhole:', map[tmp_row][tmp_col].data);
+                close_wormhole(map[tmp_row][tmp_col].data);
             }
         }
+    }
+
+    // cut snake here
+    for (var a = 0; a < snake.length; a++) {
+        console.log('escaping tail', a);
+        escape_tail(a);
     }
 
     $('#block_' + portal_pair[0].row + '_' + portal_pair[0].col).text('');
@@ -572,7 +678,11 @@ var put_portal = function () {
     display_portal_remain_time();
 };
 
-var clean_wormhole = function (wormhole_id) {
+var close_wormhole = function (wormhole_id) {
+    wormhole[wormhole_id].open = false;
+};
+
+var delete_wormhole = function (wormhole_id) {
     delete wormhole[wormhole_id];
 };
 
@@ -581,7 +691,7 @@ var get_wormhole = function (row, col) {
     while (wormhole[a] != undefined) {
         a++;
     }
-    wormhole[a] = {row: row, col: col};
+    wormhole[a] = {row: row, col: col, open: true};
     return a;
 };
 

@@ -1,25 +1,40 @@
 TODO
 ====
 
--   驚喜模式 portal, 參考 20131124 的 [idea]
-
 -   蛇死亡時要在左方資訊框表示
 
--   .block 的字體顏色
-
 -   巧克力的顏色再調整, 目前仍太淺
+
+-   AI for 經典模式
 
 -   思考競技場模式是否有需要 (蛇的預設長度為 3, 做為競技場沒有遊戲性)
 
 -   黑白蛇
-
--   AI for 經典模式
 
 -   AI for portal
 
 -   Tron 模式
 
 -   AI for Tron 模式
+
+20140228
+========
+
+-   調整 .block 的字體顏色
+
+-   地圖資料格式修改, 增加一個 body-end, 用來表示斷掉身體的結束 ::
+
+    {
+        type: head/body/body-jump/body-end/tail/portal/cube/ground/wall,
+        color: green/yellow,
+        row: 1/0/-1,
+        col: 1/0/-1,
+        data: (number),
+    }
+
+-   實作出切斷的功能, 接下來要製作切斷後的效果, 以及切斷後相關的資料回收
+
+-   切斷效果完成, Portal 模式完成
 
 20140227
 ========
@@ -64,7 +79,7 @@ TODO
 -   地圖資料改用 json object 儲存 ::
 
     {
-        type: head/body/body_jump/tail/portal/cube/empty/ground/wall,
+        type: head/body/body-jump/tail/portal/cube/ground/wall,
         color: green/yellow,
         row: 1/0/-1,
         col: 1/0/-1,

@@ -13,12 +13,13 @@ var get_snake = function (color, hr, hc, tr, tc, dr, dc) {
     new_snake.dir = {};
     new_snake.dir.col = dc;
     new_snake.dir.row = dr;
-    new_snake.grow = false;
-    new_snake.in_portal = 0;
+    new_snake.grow = 0;
+    new_snake.in_portal = [];
     return new_snake;
 };
 
-snake = [];
+var snake = [];
+var dying_tail = [];
 
 var construct_snake = function () {
     snake = [
@@ -106,29 +107,15 @@ var move_tail = function (index) {
         snake[index].grow--;
         return;
     }
-    var tr = snake[index].tail.row;
-    var tc = snake[index].tail.col;
+    var next_tail = get_next_block(snake[index].tail.row, snake[index].tail.col);
+    var tr = next_tail.row;
+    var tc = next_tail.col;
     
-    if (map[tr][tc].type == 'body-jump') {
-        var wormhole_id = map[tr][tc].data;
-        var connect_point = wormhole[wormhole_id];
-        console.log('wormhole_id:', wormhole_id);
-        console.log('connect point:', connect_point);
-        tr = connect_point.row;
-        tc = connect_point.col;
-        clean_wormhole(wormhole_id);
-    } else {
-        var dir_row = map[tr][tc].row;
-        var dir_col = map[tr][tc].col;
-        tr = (tr + dir_row + MAP_HEIGHT) % MAP_HEIGHT;
-        tc = (tc + dir_col + MAP_WIDTH ) % MAP_WIDTH;
-    }
-
     var old_tr = snake[index].tail.row;
     var old_tc = snake[index].tail.col;
     if (map[old_tr][old_tc].type == 'body-jump') {
-        clean_wormhole(map[old_tr][old_tc].data);
-        snake[index].in_portal -= 1;
+        close_wormhole(map[old_tr][old_tc].data);
+        snake[index].in_portal.shift();
     }
     set_map_data(old_tr, old_tc, {type: 'ground'});
     snake[index].tail.row = tr;
@@ -182,14 +169,15 @@ var move_head = function (index) {
                 });
         console.log(map[br][bc].type);
         console.log(map[br][bc].data);
-        snake[index].in_portal += 1;
+        snake[index].in_portal = snake[index].in_portal.concat([wormhole_id]);
     }
 
     // check collision here
     switch (map[hr][hc].type) {
     case 'head':
     case 'body':
-    case 'body_jump':
+    case 'body-jump':
+    case 'body-end':
     case 'tail':
     case 'wall':
         set_state('GAME_END');
@@ -226,4 +214,75 @@ var parse_direction = function (key) {
 
 var enqueue = function (index, key) {
     snake[index].queue.push(key);
+};
+
+var escape_tail = function (index) {
+    // new tail row/col
+    var ntr = snake[index].tail.row;
+    var ntc = snake[index].tail.col;
+
+    // iterator tail row/col
+    var itr = ntr;
+    var itc = ntc;
+
+    // find a safe tail position
+    while (true) {
+
+        console.log(itr, itc, map[itr][itc].type);
+        if (map[itr][itc].type == 'head') {
+            break;
+        } else if (map[itr][itc].type == 'body-jump') {
+
+            var tmp_pos = get_next_block(itr, itc);
+
+            if (wormhole[ map[itr][itc].data ].open == false) {
+                // connection point broken
+                add_dying_tail(ntr, ntc);
+                delete_wormhole(map[itr][itc].data);
+                set_map_data(itr, itc, {type: 'body-end'});
+                ntr = tmp_pos.row;
+                ntc = tmp_pos.col;
+                itr = ntr;
+                itc = ntc;
+            } else {
+                itr = tmp_pos.row;
+                itc = tmp_pos.col;
+            }
+
+        } else {
+            // nothing special, keep searching
+            var tmp_pos = get_next_block(itr, itc);
+            if (itr == tmp_pos.row && itc == tmp_pos.col) {
+                console.log('Error: the next block of (', itr, ',', itc, ') is itself.');
+            }
+            itr = tmp_pos.row;
+            itc = tmp_pos.col;
+        }
+    }
+    snake[index].tail.row = ntr;
+    snake[index].tail.col = ntc;
+};
+
+var add_dying_tail = function (row, col) {
+    dying_tail.push({row: row, col: col});
+};
+
+var move_dying_tail = function () {
+    var new_dying_tail = [];
+
+    for (var a = 0; a < dying_tail.length; a++) {
+        var dtr = dying_tail[a].row;
+        var dtc = dying_tail[a].col;
+        if (map[dtr][dtc].type == 'body-end') {
+            set_map_data(dtr, dtc, {type: 'wall'});
+        } else {
+            var tmp_pos = get_next_block(dtr, dtc);
+            set_map_data(dtr, dtc, {type: 'wall'});
+            dtr = tmp_pos.row;
+            dtc = tmp_pos.col;
+            new_dying_tail.push( {row: dtr, col: dtc} );
+        }
+    }
+
+    dying_tail = new_dying_tail;
 };
