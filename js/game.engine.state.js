@@ -47,7 +47,6 @@ state_machine.set_state = function (new_state) {
 };
 
 state_machine.enter_game = function () {
-    console.log(state_machine);
     state_machine.set_state('GAME_RESET');
     /* snake position initialize to map upper right and lower down*/
 };
