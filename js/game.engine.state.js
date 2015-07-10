@@ -1,24 +1,31 @@
-var STATE = 'MENU';
+var state_machine = {};
 
+state_machine.STATE = 'MENU';
 /* Modes: CLASSIC, SUPRISE, TRON, (BATTLE_FIELD?) */
-var MODE_NAME = ['CLASSIC', 'SUPRISE', 'TRON'];
+state_machine.MODE_NAME = ['CLASSIC', 'SUPRISE', 'TRON'];
+state_machine.mode_descriptions = [
+    ['經典模式', '經典的吃方塊模式<br>以不斷長大為最高目標!', '經典'],
+    ['驚喜模式', '場上隨時會有傳送門<br>小心別在關門時進入!', '驚喜'],
+    ['TRON', '???', 'TRON'],
+];
+state_machine.MODE = 0;
 
-var MODE = 0;
-
-var mode_descriptions = [
-        ['經典模式', '經典的吃方塊模式<br>以不斷長大為最高目標!', '經典'],
-        ['驚喜模式', '場上隨時會有傳送門<br>小心別在關門時進入!', '驚喜'],
-        ['TRON', '???', 'TRON'],
-    ];
-
-var get_state = function () {
-    return STATE;
+state_machine.get_mode_name = function () {
+    return state_machine.MODE_NAME[state_machine.MODE];
 };
 
-var set_state = function (new_state) {
+state_machine.get_mode_description = function () {
+    return state_machine.mode_descriptions[state_machine.MODE];
+};
+
+state_machine.get_state = function () {
+    return state_machine.STATE;
+};
+
+state_machine.set_state = function (new_state) {
     /* states: MENU, GAME_PAUSE, GAME_ING */
-    STATE = new_state;
-    switch (STATE) {
+    state_machine.STATE = new_state;
+    switch (state_machine.STATE) {
     case 'MENU':
         $('#main_menu').css('display', 'block');
         $('#game_field').css('display', 'none');
@@ -39,25 +46,27 @@ var set_state = function (new_state) {
     }
 };
 
-var enter_game = function () {
-    set_state('GAME_RESET');
+state_machine.enter_game = function () {
+    console.log(state_machine);
+    state_machine.set_state('GAME_RESET');
     /* snake position initialize to map upper right and lower down*/
 };
 
-var back2menu = function () {
-    set_state('MENU');
+state_machine.back2menu = function () {
+    state_machine.set_state('MENU');
 };
 
-var next_mode = function () {
-    MODE = (MODE + 1) % MODE_NAME.length;
-    $('#mode_name').html(mode_descriptions[MODE][0]);
-    $('#mode_description').html(mode_descriptions[MODE][1]);
-    $('#game_mode').html(mode_descriptions[MODE][2]);
+state_machine.next_mode = function () {
+    state_machine.MODE = (state_machine.MODE + 1) % state_machine.MODE_NAME.length;
+    $('#mode_name').html(state_machine.mode_descriptions[state_machine.MODE][0]);
+    $('#mode_description').html(state_machine.mode_descriptions[state_machine.MODE][1]);
+    $('#game_mode').html(state_machine.mode_descriptions[state_machine.MODE][2]);
 };
 
-var last_mode = function () {
-    MODE = (MODE - 1 + MODE_NAME.length) % MODE_NAME.length;
-    $('#mode_name').html(mode_descriptions[MODE][0]);
-    $('#mode_description').html(mode_descriptions[MODE][1]);
-    $('#game_mode').html(mode_descriptions[MODE][2]);
+state_machine.last_mode = function () {
+    state_machine.MODE = (state_machine.MODE - 1 + state_machine.MODE_NAME.length) % state_machine.MODE_NAME.length;
+    $('#mode_name').html(state_machine.mode_descriptions[state_machine.MODE][0]);
+    $('#mode_description').html(state_machine.mode_descriptions[state_machine.MODE][1]);
+    $('#game_mode').html(state_machine.mode_descriptions[state_machine.MODE][2]);
 };
+

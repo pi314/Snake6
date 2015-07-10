@@ -110,7 +110,7 @@ var move_tail = function (index) {
     var next_tail = get_next_block(snake[index].tail.row, snake[index].tail.col);
     var tr = next_tail.row;
     var tc = next_tail.col;
-    
+
     var old_tr = snake[index].tail.row;
     var old_tc = snake[index].tail.col;
     if (map[old_tr][old_tc].type == 'body-jump') {
@@ -180,7 +180,7 @@ var move_head = function (index) {
     case 'body-end':
     case 'tail':
     case 'wall':
-        set_state('GAME_END');
+        state_machine.set_state('GAME_END');
         return;
         break;
     case 'cube':

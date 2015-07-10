@@ -52,7 +52,7 @@ var start_timer = function () {
             }
         }
 
-        if (MODE_NAME[MODE] == 'SUPRISE' && portal_timer_wait == 0) {
+        if (state_machine.get_mode_name() == 'SUPRISE' && portal_timer_wait == 0) {
             portal_timer--;
             display_portal_remain_time();
             if (portal_timer <= 0) {
@@ -64,7 +64,7 @@ var start_timer = function () {
 
         snake_wait = (snake_wait + 1) % 6;
 
-        if (MODE_NAME[MODE] == 'SUPRISE') {
+        if (state_machine.get_mode_name() == 'SUPRISE') {
             portal_timer_wait = (portal_timer_wait + 1) % (1000 / TIME_UNIT);
         }
 
@@ -84,20 +84,20 @@ var wasd2arrow = {
 
 var bind_keys = function () {
     KeyManager.keydown(' ', function () {
-        switch (get_state()) {
+        switch (state_machine.get_state()) {
         case 'MENU':
             break;
         case 'GAME_RESET':
-            set_state('GAME_ING');
+            state_machine.set_state('GAME_ING');
             break;
         case 'GAME_PAUSE':
-            set_state('GAME_ING');
+            state_machine.set_state('GAME_ING');
             break;
         case 'GAME_ING':
-            set_state('GAME_PAUSE');
+            state_machine.set_state('GAME_PAUSE');
             break;
         case 'GAME_END':
-            set_state('GAME_RESET');
+            state_machine.set_state('GAME_RESET');
         }
     }).keydown(['UP', 'LEFT', 'RIGHT', 'DOWN'], function (i) {
         enqueue(0, i);
