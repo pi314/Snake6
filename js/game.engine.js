@@ -83,7 +83,7 @@ var wasd2arrow = {
 };
 
 var bind_keys = function () {
-    KeyManager.keydown('SPACE', function () {
+    KeyManager.keydown(' ', function () {
         switch (get_state()) {
         case 'MENU':
             break;
