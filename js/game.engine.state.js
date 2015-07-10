@@ -29,6 +29,7 @@ state_machine.set_state = function (new_state) {
     case 'MENU':
         $('#main_menu').css('display', 'block');
         $('#game_field').css('display', 'none');
+        stop_timer();
         break;
     case 'GAME_RESET':
         $('#main_menu').css('display', 'none');
@@ -36,19 +37,19 @@ state_machine.set_state = function (new_state) {
         reset();
     case 'GAME_PAUSE':
     case 'GAME_END':
-        show_pause_message();
         stop_timer();
+        show_pause_message();
         break;
     case 'GAME_ING':
-        clear_pause_message();
         start_timer();
+        clear_pause_message();
         break;
     }
 };
 
 state_machine.enter_game = function () {
-    state_machine.set_state('GAME_RESET');
     /* snake position initialize to map upper right and lower down*/
+    state_machine.set_state('GAME_RESET');
 };
 
 state_machine.back2menu = function () {
