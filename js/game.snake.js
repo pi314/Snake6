@@ -180,7 +180,7 @@ var move_head = function (index) {
     case 'body-end':
     case 'tail':
     case 'wall':
-        state_machine.set_state('GAME_END');
+        state_manager.set_state('GAME_END');
         return;
         break;
     case 'cube':

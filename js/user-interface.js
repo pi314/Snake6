@@ -5,7 +5,7 @@ var interface_init = function () {
 };
 
 var main_menu_init = function () {
-    var md = state_machine.get_mode_description();
+    var md = state_manager.get_mode_description();
     $('#mode_name').html(md[0]);
     $('#mode_description').html(md[1]);
 };
