@@ -5,8 +5,9 @@ var interface_init = function () {
 };
 
 var main_menu_init = function () {
-    $('#mode_name').html(mode_descriptions[MODE][0]);
-    $('#mode_description').html(mode_descriptions[MODE][1]);
+    var md = state_manager.get_mode_description();
+    $('#mode_name').html(md[0]);
+    $('#mode_description').html(md[1]);
 };
 
 var panel_init = function () {
